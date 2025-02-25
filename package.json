@@ -1,0 +1,40 @@
+{
+  "name": "be_of_tiktok",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --exec babel-node src/server.js"
+  },
+  "keywords": [
+    "be_of_tiktok"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.427.0",
+    "@aws-sdk/client-sts": "^3.427.0",
+    "@aws-sdk/lib-storage": "^3.427.0",
+    "@aws-sdk/s3-request-presigner": "^3.427.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "moment": "^2.30.1",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^2.2.5",
+    "nodemailer": "^6.9.15",
+    "sequelize": "^6.6.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.10",
+    "nodemon": "^2.0.22",
+    "sequelize-cli": "^6.2.0"
+  }
+}
