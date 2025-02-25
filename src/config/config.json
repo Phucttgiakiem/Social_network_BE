@@ -1,11 +1,12 @@
 {
   "development": {
     "username": "root",
-    "password": null,
-    "database": "hoiittp",
-    "host": "127.0.0.1",
+    "password": "cXWtUZQyJHHdnZzvzCKyhkorrUOskWSN",
+    "database": "railway",
+    "host": "turntable.proxy.rlwy.net",
+    "port": 17737,
     "dialect": "mysql",
-    "logging":false
+    "logging": false
   },
   "test": {
     "username": "root",

@@ -1,13 +1,11 @@
 const { Sequelize } = require('sequelize');
 
-
-
-
 // Option 3: Passing parameters separately (other dialects)
-const sequelize = new Sequelize('hoiittp', 'root', null, {
-  host: 'localhost',
+const sequelize = new Sequelize('railway', 'root', 'cXWtUZQyJHHdnZzvzCKyhkorrUOskWSN', {
+  host: 'turntable.proxy.rlwy.net',  // Host từ Railway
+  port: 17737,                        // Port từ Railway
   dialect: 'mysql',
-  logging: false 
+  logging: false
 });
 
 let connectDB = async () => {
