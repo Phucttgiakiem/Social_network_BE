@@ -1,9 +1,9 @@
 const { Sequelize } = require('sequelize');
 
 // Option 3: Passing parameters separately (other dialects)
-const sequelize = new Sequelize('railway', 'root',process.env.PASSMYSQL, {
-  host: 'turntable.proxy.rlwy.net',  // Host từ Railway
-  port: 17737,                        // Port từ Railway
+const sequelize = new Sequelize(process.env.DB_NAME,process.env.DB_USER,process.env.PASSMYSQL, {
+  host: process.env.HOST,  // Host từ Railway
+  port: process.env.POST,                        // Port từ Railway
   dialect: 'mysql',
   logging: false
 });
