@@ -1,4 +1,4 @@
-import db from '../models/index';
+import db from '../models/index.js';
 
 let getHomePage = async (req,res) => {
     try{

@@ -1,11 +1,11 @@
-import db from "../models/index";
-import {Op,Sequelize} from "sequelize";
+const db = require ("../models/index");
+const {Op,Sequelize} = require("sequelize");
 //import followService from "./followService";
-import LikepostService from "./likepostService";
-import CommentService from "./commentService";
-import UserService from "./userService";
+const LikepostService = require("./likepostService");
+const CommentService = require ("./commentService");
+//import UserService from "./userService";
 ////
-let GetPostwithId = (Iduser,limit,offset) => {
+let GetPostwithId = (Iduser) => {
     return new Promise(async (resolve, reject) => {
         try {
             let postData = {}
@@ -22,10 +22,9 @@ let GetPostwithId = (Iduser,limit,offset) => {
                         [Sequelize.literal(`(SELECT COUNT(*) FROM comments WHERE comments.postId = Post.id)`), 'commentCount']
                 ]},
                 order: [['createdAt', 'DESC']],
-                limit: limit,
-                offset: offset,
                 raw: false
             })
+           // console.log("kết quả: ",result);
             if(result.length > 0) {
                 postData.errCode = 0;
                 postData.errMessage = 'OK'
@@ -35,48 +34,8 @@ let GetPostwithId = (Iduser,limit,offset) => {
                 postData.errMessage = "Cannot fount any post";
                 postData.data = [];
             }
-            //console.log(result[0])
             resolve(postData);
-            // let result = await db.Post.findOne({
-            //     attributes: ['id','UserID','content','createdAt','updatedAt','Namemusicvideo','MediaURL'],
-            //     include: [
-            //         {
-            //             model: db.User,
-            //             as: 'User',
-            //             attributes: ['id','email','firstName','lastName','fullName','avatar']
-            //         }
-            //     ],
-            //     where: {id:Idpost},
-            //     raw: true
-            // })
-            // postData.errCode = 0;
-            // if(result){
-            //     let iduserlike = await LikepostService.GetAllIDuLikepost(result.id);
-            //     let countlike = await LikepostService.GetAllLikepost(result.id);
-            //     postData.errMessage = "OK"
-            //     postData.data = {
-            //             id: result.id,
-            //             UserID: result.UserID,
-            //             content: result.content,
-            //             countlike: countlike,
-            //             iduserlike:iduserlike,
-            //             createdAt: result.createdAt,
-            //             updatedAt: result.updatedAt,
-            //             hashtabvideo: result.hashtabvideo,
-            //             Namemusicvideo: result.Namemusicvideo,
-            //             MediaURL: result.MediaURL,
-            //             UserId: result['User.id'], // Đổi tên thành UserId
-            //             UserEmail: result['User.email'], // Đổi tên thành UserEmail
-            //             UserFirstName: result['User.firstName'], // Đổi tên thành UserFirstName
-            //             UserLastName: result['User.lastName'], // Đổi tên thành UserLastName
-            //             UserFullName: result['User.fullName'], // Đổi tên thành UserFullName
-            //             UserAvatar: result['User.avatar'] // Đổi tên thành UserAvatar
-            //     };
-            // }else{
-            //     postData.errMessage = "Cannot fount Post with the ID";
-            //     postData.data = {}
-            // }
-            // resolve(postData);
+            
         } catch (e) {
             reject(e);
         }
@@ -170,79 +129,7 @@ let Getpostofowner = (Iduser) => {
         }
     })
 }
-let GetAllPost = (userId,limit,offset) => {
-    /* return new Promise(async(resolve,reject) => {
-        try{
-            if (isNaN(limit) || isNaN(offset)) {
-                reject(new Error('Invalid limit or offset value'));
-            }
-            let postData = {};
-            
-            const subqueryResult = await db.Post.findAll({
-                attributes: [
-                    [Sequelize.fn('MAX', Sequelize.col('id')), 'id']
-                ],
-                group: ['UserID'],
-                raw: true
-            });
-
-            // Trích xuất các ID từ kết quả của subquery
-            const postIds = subqueryResult.map(row => row.id);
-            
-            // Truy vấn chính để lấy chi tiết của post mới nhất cho mỗi user
-            let post = await db.Post.findAll({
-                where: {
-                    id: {
-                        [Op.in]: postIds
-                    }
-                },
-                include: [
-                    { model: db.User,as: 'User', attributes: ['id', 'fullName', 'avatar','email'] },
-                    { model: db.Likepost,as: 'likes', attributes: ['id', 'UserID'] },
-                ],
-                attributes: {
-                    include: [
-                        [Sequelize.literal(`(SELECT COUNT(*) FROM comments WHERE comments.postId = Post.id)`), 'commentCount']
-                    ]
-                },
-                order: [['createdAt', 'DESC']],
-                limit: limit,
-                offset: offset,
-                raw: false,
-            });
-            
-            postData.errCode = 0;
-            if(post.length > 0){
-                let allpost = post.map(postofuser => ({
-                    idpost: postofuser.id,
-                    userID: postofuser.UserID,
-                    content: postofuser.Content,
-                    mediaURL: postofuser.MediaURL,
-                    formatvideo: postofuser.Formatvideo,
-                    hashtabvideo: postofuser.Hashtabvideo,
-                    namemusicvideo: postofuser.Namemusicvideo,
-                    islikepost: userId && postofuser.likes.length > 0 && postofuser.likes.find(like => parseInt(like.UserID) === parseInt(userId)) ? true : false,
-                    countlike: postofuser.likes.length || 0,
-                    countcomment: postofuser.commentCount || 0,
-                    userinfo: {
-                        id: postofuser.UserID,
-                        fullName: postofuser.User.fullName || "",
-                        avatar: postofuser.User.avatar || "",
-                        email: postofuser.User.email ||  "",
-                    }
-                }));
-                postData.errMessage = 'OK';
-                postData.data = allpost;
-            }
-            else{
-                postData.errMessage = "Cannot found post";
-                postData.data = {};
-            } 
-            resolve(postData);
-        }catch(e){
-            reject(e);
-        }
-    }); */
+let GetAllPost = (limit,offset) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (isNaN(limit) || isNaN(offset)) {
@@ -449,6 +336,39 @@ let removepost = (idpost) => {
         }
     })
 }
+let GetPost = (idposts) => {
+    return new Promise(async(resolve,reject) => {
+        try {
+            let checkposts = await CheckPost(idposts);
+            let postData = {}
+            if(!checkposts){
+                postData.errCode = 1;
+                postData.errMessage = "Cannot found the post with id"
+            }else {
+                let result = await db.Post.findOne({
+                    where: {
+                        id:idposts
+                    },
+                    include : [
+                        { model: db.User,as: 'User',attributes: ['id','email','firstName','lastName','fullName','avatar']},
+                        { model: db.Likepost,as: 'likes', attributes: ['UserID']},
+                    ],
+                    attributes: {
+                        include: [
+                            [Sequelize.literal(`(SELECT COUNT(*) FROM comments WHERE comments.postId = Post.id)`), 'commentCount']
+                    ]},
+                    raw: false
+                });
+                postData.errCode = 0;
+                postData.errMessage = "OK";
+                postData.Data = result;
+            }
+            resolve(postData);
+        } catch(err){
+            reject(err);
+        }
+    })
+}
 module.exports = {
     GetAllPost : GetAllPost,
     GetpostwithId: GetPostwithId,
@@ -457,5 +377,6 @@ module.exports = {
     Checkpost: CheckPost,
     Createnewpost: Createpost,
     RemovePost: removepost,
-    Updatepostuser: Updatepost 
+    Updatepostuser: Updatepost,
+    GetPost
 }

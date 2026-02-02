@@ -1,9 +1,9 @@
-import db from "../models/index";
-import {Op,Sequelize, where} from "sequelize";
-import postService from "./postService";
-import userService from "./userService";
-import usergoogleService from "./usergoogleService";
-import moment from "moment";
+const db = require ("../models/index");
+//import {Op,Sequelize, where} from "sequelize";
+//import postService from "./postService";
+const userService = require("./userService");
+//import usergoogleService from "./usergoogleService";
+const moment = require("moment");
 let GetCountcomment = (idpost) => {
     return new Promise (async(resolve,reject) => {
         try {
@@ -32,6 +32,7 @@ let GetAllDetailcomment = (idpost,limit,offset) => {
                     }
                 ],
                 where: {PostID:idpost},
+                order: [['createdAt', 'DESC']],
                 limit: limit,
                 offset: offset,
                 raw: false
@@ -46,49 +47,6 @@ let GetAllDetailcomment = (idpost,limit,offset) => {
                 commentdata.data = [];
             }
             resolve(commentdata);
-            // if(isExist){
-            //     let resultquery = await db.Comment.findAll({
-            //         attributes: ['id','PostID','UserID','Content','createdAt','updatedAt'],
-            //         include: [
-            //             {
-            //                 model: db.User,
-            //                 as: 'User',
-            //                 attributes: ['id','email','firstName','lastName','fullName','avatar']
-            //             }
-            //         ],
-            //         where: {PostID: idpost},
-            //         raw: true
-            //     });
-            //     commentdata.errCode = 0;
-            //    if(resultquery){
-            //         commentdata.errMessage = "OK";
-            //         commentdata.data = []
-            //         resultquery.forEach((content) => {
-            //            let itemdata = {
-            //                 id: content.id,
-            //                 idPost: content.PostID,
-            //                 idUser: content.UserID,
-            //                 Detailcomment: content.Content,
-            //                 Email:content['User.email'],
-            //                 FirstName: content['User.firstName'],
-            //                 LastName: content['User.lastName'],
-            //                 FullName: content['User.fullName'],
-            //                 Avatar: content['User.avatar'],
-            //                 CreatedAt:content.createdAt,
-            //                 UpdatedAt: content.updatedAt
-            //             };
-            //             commentdata.data.push(itemdata);
-            //         });
-            //    }else{
-            //         commentdata.errMessage = "Cannot found comment";
-            //         commentdata.data = {}
-            //    }
-            // }else{
-            //     commentdata.errCode = 1;
-            //     commentdata.errMessage = 'Cannot found post';
-            //     commentdata.data = {};
-            // }
-            // resolve(commentdata);
         } catch(e){
             reject(e)
         }
@@ -107,11 +65,8 @@ let HandleAddCommentPost = (Checkpost,idpost,idUser,contentcomment) => {
                     Timestamp : moment().format('YYYY-MM-DD HH:mm:ss')
                 });
                 //Get Info comment of user
-                 let user = await userService.handleUserGetByID(newComment.UserID);
+                let user = await userService.handleUserGetByID(newComment.UserID);
 
-               /* if(user.data == null){
-                    user = await usergoogleService.handleGetUser(newComment.UserID);
-                } */
                 let countcomment = await GetCountcomment(idpost);
                 let newcommentData = {
                     ...newComment.dataValues, // Spread existing properties of newComment
@@ -168,7 +123,7 @@ let HandleEditcomment = (idcomment,comment) => {
     return new Promise (async(resolve,reject) => {
         try{
             let commentData = {};
-            let [rowUpdated,updatedcomment] = await db.Comment.update({Content:comment},{where: {id : idcomment}});
+            let [rowUpdated] = await db.Comment.update({Content:comment},{where: {id : idcomment}});
             if(rowUpdated){
                 let commentjustedit = await db.Comment.findOne({where: {id : idcomment}});
                 commentData.errCode = 0;

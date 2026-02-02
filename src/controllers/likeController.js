@@ -1,6 +1,5 @@
-import likeService from "../services/likepostService";
-import PostService from "../services/postService";
-import { io } from '../server';
+const likeService = require ("../services/likepostService");
+const { getIo } = require ('../socket');
 let AddLikepost = async (req,res) => {
     let idUser = req.body.iduser;
     let idPost = req.body.idpost;
@@ -10,21 +9,14 @@ let AddLikepost = async (req,res) => {
             message : "all inputs parameter is imperative!"
         });
     }
+    let resultLike = await likeService.AddLikepost(idPost,idUser);
     try{
-        let resultLike = await likeService.AddLikepost(idPost,idUser);
-        if(resultLike.errCode === 0){
-            try {
-               // let replacepost = await PostService.GetAllPost();
-                let newpost = resultLike
+            if(resultLike.errCode === 0){
+                const io = getIo();
+                let newpost = resultLike.data;
+                console.log("mày đã like: ",newpost);
                 io.emit('add-like',newpost);
-            } catch (socketError) {
-                    console.log('Socket error:', socketError);
-                    return res.status(500).json({
-                    errCode: 1,
-                    message: "Socket error"
-                    });
-                }
-            }
+            } 
             return res.status(200).json({
                 errCode:resultLike.errCode,
                 message:resultLike.errMessage
@@ -39,7 +31,6 @@ let AddLikepost = async (req,res) => {
 let RemoveLikepost = async (req,res) => {
     let idUser = req.body.iduser;
     let idPost = req.body.idpost;
-   // console.log(idUser+" "+idPost+"unlike");
     if(!idUser || !idPost){
         return res.status(500).json({
             errCode : 4,
@@ -47,23 +38,24 @@ let RemoveLikepost = async (req,res) => {
         });
     }
     let resultLike = await likeService.RemoveLikepost(idPost,idUser);
-    if(resultLike.errCode === 0){
-        try {
-           // let replacepost = await PostService.GetAllPost();
-            let newpost = resultLike
-            io.emit('remove-like',newpost);
-          } catch (socketError) {
-            console.log('Socket error:', socketError);
-            return res.status(500).json({
-              errCode: 1,
-              message: "Socket error"
+    try {
+            if(resultLike.errCode === 0){
+                const io = getIo();
+                let newpost = resultLike.data;
+                console.log("mày đã unlike: ",newpost);
+                io.emit('remove-like',newpost);
+            } 
+            return res.status(200).json({
+                errCode:resultLike.errCode,
+                message:resultLike.errMessage,
             });
-        }
+        
+    }catch (err) {
+        return res.status(500).json({
+            errCode: 1,
+            message: "Internal server error"
+        });
     }
-    return res.status(200).json({
-        errCode:resultLike.errCode,
-        message:resultLike.errMessage,
-    });
 }
 let CheckLikepostUser = async (req,res) => {
     let idUser = req.body.iduser;

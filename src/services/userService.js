@@ -1,34 +1,53 @@
-import db from "../models/index";
-import bcrypt from "bcryptjs";
-import {Op,Sequelize, where} from "sequelize";
-import nodemailer from "nodemailer";
-import * as dotenv from "dotenv";
+const db = require ("../models/index");
+const bcrypt = require ("bcryptjs");
+const pkg = require ("sequelize");
+const {genneralAccessToken,genneralRefreshToken} =  require("./JwtService");
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+//import { is } from "sequelize/types/lib/operators";
 dotenv.config();
-
+const { Op } = pkg;
 
 let handleUserLogin = (email,password) => {
     return new Promise(async(resolve,reject)=>{
         try{
-            let userData = {};
+            
+            let userData = {
+                user: {}
+            };
                 let isExist = await checkUseremail(email);
                 if (isExist) {
                     //user already exist
                     //compare password
-
+                    
                     let user = await db.User.findOne({
-                        attributes: ['id','email','password','fullName','avatar'],
+                        attributes: ['id','email','password'],
                         where: { email: email },
                         raw: true
 
                     });
+                    
                     if (user) {
                         let check = bcrypt.compareSync(password, user.password); // false
                         //let check = true;
+                        
                         if (check) {
                             userData.errCode = 0;
                             userData.errMessage = 'OK';
-                            delete user.password;
-                            userData.user = user;
+                            // -------------- poin will verify token ------------------
+                            const access_Token = await genneralAccessToken({
+                                id: user.id,
+                                email: user.email
+                            });
+                            const refresh_Token = await genneralRefreshToken({
+                                id: user.id,
+                                email: user.email
+                            });
+                            userData.user = {
+                                access_Token,
+                                refresh_Token
+                            };
+                            // --------------------------------------------------------
                         } else {
                             userData.errCode = 3;
                             userData.errMessage = 'Wrong password';
@@ -37,7 +56,6 @@ let handleUserLogin = (email,password) => {
                         userData.errCode = 2;
                         userData.errMessage = `User's not found`
                     }
-
                 } else {
                     //return error
                     userData.errCode = 1;
@@ -301,7 +319,7 @@ let GetProfileUser = (id) => {
                 result.errMessage = 'Cannot found Profile User, Please try again !!!';
                 result.data = [];
             }else {
-                let videoowner = await db.Post.findAll({
+                /* let videoowner = await db.Post.findAll({
                     attributes: ['id','MediaURL','Timestamp','UserID'],
                     where: {UserID: user.id},
                     row:true
@@ -332,15 +350,13 @@ let GetProfileUser = (id) => {
                     MediaURL: item.MediaURL,
                     UserID: item.UserID,
                     Timestamp: item.Timestamp
-                }));
+                })); */
                 result.errCode = 0;
                 result.errMessage = 'OK';
-                result.data = {
-                    profile: user,
-                    videoowner: videoowner,
+                result.data = user;
+                   /*  videoowner: videoowner,
                     videolike: videolike,
-                    totallike: totallikevideoowner
-                }
+                    totallike: totallikevideoowner */
             }
             resolve(result);
         } catch(err){

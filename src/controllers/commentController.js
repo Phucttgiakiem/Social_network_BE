@@ -1,7 +1,7 @@
-import commentService from "../services/commentService";
-import postService from "../services/postService";
-import usergoogleService from "../services/usergoogleService";
-import { io } from '../server'; // Import io from server.js
+const commentService = require("../services/commentService");
+const postService = require("../services/postService");
+//const usergoogleService = require ("../services/usergoogleService");
+const { getIo } = require ('../socket');
 let PushCommentpost = async (req,res) => {
     let idpost = req.body.idpost;
     let comment = req.body.comment;
@@ -12,26 +12,19 @@ let PushCommentpost = async (req,res) => {
             message: "all inputs parameter is imperative!"
         });
     }
+    let resultcomment = await commentService.HandleAddCommentPost(postService.Checkpost,idpost, iduser, comment) 
     try {
-            let resultcomment = await commentService.HandleAddCommentPost(postService.Checkpost,idpost, iduser, comment);
-            if (resultcomment.errCode === 0) {
-                try {
-                    let newltcm = resultcomment.data.newcommentData;
-                    io.emit('add-comment',newltcm);
-                  } catch (socketError) {
-                    console.log('Socket error:', socketError);
-                    return res.status(500).json({
-                      errCode: 1,
-                      message: "Socket error"
-                    });
-                }
-            }
-            
-            return res.status(200).json({
-                errCode: resultcomment.errCode,
-                message: resultcomment.errMessage,
-                data: resultcomment.data.countcomment
-            });
+        if (resultcomment.errCode === 0) {
+            const io = getIo();
+            let newltcm = resultcomment.data.newcommentData;
+            io.emit('add-comment',newltcm);
+        }
+        
+        return res.status(200).json({
+            errCode: resultcomment.errCode,
+            message: resultcomment.errMessage,
+            data: resultcomment.data.countcomment
+        });
     } catch (error) {
         return res.status(500).json({
             errCode: 1,
@@ -41,7 +34,6 @@ let PushCommentpost = async (req,res) => {
 }
 let RemoveCommentpost = async (req,res) => {
     let idcomment = req.body.idcomment;
-   //let idpost = req.body.id;
     if(!idcomment){
         return res.status(500).json({
             errCode: 1,
@@ -49,29 +41,27 @@ let RemoveCommentpost = async (req,res) => {
         });
     }
     let result = await commentService.HandleRemoveComment(idcomment);
-    if(result.errCode === 0){
-        try {
-           // let newlistcm = await commentService.HandleGetAllDetailComment(postService.Checkpost,idpost);
+    try {
+        if(result.errCode === 0){
+            const io = getIo();
             let commentdelete = idcomment;
             io.emit('remove-com',commentdelete);
-          } catch (socketError) {
-            console.log('Socket error:', socketError);
-            return res.status(500).json({
-              errCode: 1,
-              message: "Socket error"
-            });
-        }
+        } 
+        return res.status(200).json({
+            errCode: result.errCode,
+            message: result.errMessage,
+            data: result.data
+        });
+    }catch (socketError) {
+        return res.status(500).json({
+            errCode: 1,
+            message: "Internal server error"
+        });
     }
-    return res.status(200).json({
-        errCode: result.errCode,
-        message: result.errMessage,
-        data: result.data
-    });
 }
 let Editcomment = async (req,res) => {
     let idcomment = req.body.idcomment;
     let comment = req.body.newcomment;
-    let idpost = req.body.id;
     if(!idcomment || !comment){
         return res.status(500).json({
             errCode: 1,
@@ -79,23 +69,23 @@ let Editcomment = async (req,res) => {
         });
     }
     let result = await commentService.Handleeditcomment(idcomment,comment);
-    if(result.errCode === 0) {
-        try {
+    try {
+        if(result.errCode === 0) {
+            const io = getIo();
             const commentedit = result.data;
             io.emit('edit-com',commentedit);
-          } catch (socketError) {
-            console.log('Socket error:', socketError);
-            return res.status(500).json({
-              errCode: 1,
-              message: "Socket error"
-            });
         }
+        return res.status(200).json({
+            errCode: result.errCode,
+            message: result.errMessage,
+        });   
     }
-    console.log(result.data);
-    return res.status(200).json({
-        errCode: result.errCode,
-        message: result.errMessage,
-    });
+    catch (error) {
+        return res.status(500).json({
+            errCode: 1,
+            message: "Internal server error"
+        });
+    }
 }
 let GetAlldetailComment = async (req,res) => {
     let idpost = req.body.IDpost;
@@ -109,7 +99,6 @@ let GetAlldetailComment = async (req,res) => {
         });
     }
     let result = await commentService.HandleGetAllDetailComment(idpost,limit,offset);
-   // console.log("result found: ",result.data.length);
     return res.status(200).json({
         errCode: result.errCode,
         message: result.errMessage,

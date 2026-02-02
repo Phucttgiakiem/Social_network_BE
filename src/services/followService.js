@@ -1,5 +1,5 @@
-import { where } from "sequelize";
-import db from "../models/index";
+//import { where } from "sequelize";
+const db = require ("../models/index");
 
 let GetAllFollowofUser = (IdUser) => {
     return new Promise(async(resolve,reject) => {

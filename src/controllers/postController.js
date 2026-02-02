@@ -1,12 +1,12 @@
-import postService from  "../services/postService";
-import { S3Client,PutObjectCommand,DeleteObjectCommand } from "@aws-sdk/client-s3";
+const postService = require ("../services/postService");
+const { S3Client,PutObjectCommand,DeleteObjectCommand } = require("@aws-sdk/client-s3");
 //import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 let GetAllpost = async(req,res) => {
-    let userId = req.body.Iduser;
-    let page = req.body._page;
-    let limit = req.body._limit;
-    let offset = (page - 1) * limit;
-    let postData = await postService.GetAllPost(userId,limit,offset);
+   
+    let page = Number.parseInt(req.body._page);
+    let limit = Number.parseInt(req.body._limit);
+    let offset = (page - 1)*limit;
+    let postData = await postService.GetAllPost(limit,offset);
   //  console.log(postData);
      return res.status(200).json({
          errCode: postData.errCode,
@@ -16,30 +16,26 @@ let GetAllpost = async(req,res) => {
 }
 
 let GetPostwithiduser = async (req,res) => {
-    //let Idpost = req.body.Id;
     let Iduser = parseInt(req.body.Iduser);
-    let limit = parseInt(req.body._limit);
+    /* let limit = parseInt(req.body._limit);
     let page = parseInt(req.body._page);
-    let offset = (page - 1) * limit;
-    console.log("result: ",Iduser," ",page," ",limit," ",offset);
-    
+    let offset = (page - 1) * limit; */
     if(!Iduser){
         return res.status(500).json({
             errCode: 1,
             message: 'Missing inputs parameter !'
         })
     }
-    let PostData = await postService.GetpostwithId(Iduser,limit,offset);
+    let PostData = await postService.GetpostwithId(Iduser);
     return res.status(200).json({
         errCode: PostData.errCode,
         message: PostData.errMessage,
-        page: PostData.data.length > 0 ? page + 1 : page,
         post: PostData.data ? PostData.data : []
     })
 }
 let GetPostandinfonecessary = async (req,res) => {
     let Iduser = req.body.iduser;
-    console.log("Iduser: ",Iduser);
+   // console.log("Iduser: ",Iduser);
     if(!Iduser){
         return res.status(500).json({
             errCode: 1,
@@ -53,21 +49,7 @@ let GetPostandinfonecessary = async (req,res) => {
         post: PostData.data ? PostData.data : []
     })
 }
-// let GetPostwithiduser = async (req,res) => {
-//     let Iduser = req.body.iduser;
-//     if(!Iduser) {
-//         return res.status(500).json({
-//             errCode: 1,
-//             message: 'Missing inputs parameter !'
-//         })
-//     }
-//     let PostData = await postService.GetAllpostofowner(Iduser);
-//     return res.status(200).json({
-//         errCode: PostData.errCode,
-//         message: PostData.errMessage,
-//         post: PostData.data
-//     })
-// }
+
 let uploadFile = async (file) => {
     // Tạo client S3
     const s3 = new S3Client({
@@ -128,6 +110,8 @@ let Createpost = async (req, res) => {
 
     const { iduser: Iduser, description: Description, namemusicvideo } = jsonData;
     const file = req.file;
+
+    //console.log("mày đang ở server: ",req);
     
     let Path = "";
     // Kiểm tra các thông tin bắt buộc
@@ -189,11 +173,27 @@ let Updatepost = async (req,res) => {
         message: data.errMessage
     })
 }
+let GetPost = async (req,res) => {
+    let idpost = req.body.idpost;
+    if(!idpost) {
+        return res.status(404).json({
+            errCode: 1,
+            message: "Missing input parameter !"
+        })
+    }
+    let data = await postService.GetPost(idpost);
+    return res.status(200).json({
+        errCode: data.errCode,
+        message: data.errMessage,
+        post: data.Data
+    })
+}
 module.exports = {
     GetAllPost : GetAllpost,
     GetAllPostswithOwner : GetPostwithiduser,
     GetPostandinfonecessary:GetPostandinfonecessary,
     Createnewpost : Createpost,
     HandleRemovepost: Removepost,
-    HandleUpdatepost: Updatepost
+    HandleUpdatepost: Updatepost,
+    GetPost
 }

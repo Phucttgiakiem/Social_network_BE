@@ -1,5 +1,5 @@
-import { where } from "sequelize";
-import db from "../models/index";
+//import { where } from "sequelize";
+const db = require("../models/index");
 
 let GetAllLikepost = (idPost) => {
     return new Promise (async(resolve,reject) => {
@@ -27,7 +27,7 @@ let AddLikepost = (idPost,idUser) => {
             let findUserLike = await CheckLikeofUser(idPost,idUser);
             
             if(!findUserLike.data){
-                let createLikepost = await db.Likepost.create({
+                await db.Likepost.create({
                     PostID: idPost,
                     UserID:idUser,
                 });
@@ -35,14 +35,18 @@ let AddLikepost = (idPost,idUser) => {
                 likeData.errMessage = "OK"; 
                 likeData.data = {
                     id: idPost,
-                    countlike : await GetAllLikepost(idPost)
+                    countlike : await GetAllLikepost(idPost),
+                    typelike: "addlike",
+                    UserID: idUser
                 };
             }else {
                 likeData.errCode = 1;
                 likeData.errMessage = "You have like post!";
                 likeData.data = {
                     id: idPost,
-                    countlike : await GetAllLikepost(idPost)
+                    countlike : await GetAllLikepost(idPost),
+                    typelike: "addlike",
+                    UserID: idUser
                 };
             }
             resolve(likeData);
@@ -72,7 +76,9 @@ let RemoveLikepost = (idPost,idUser) => {
                     LikepostData.errMessage = "OK";
                     LikepostData.data = {
                         id: idPost,
-                        countlike : await GetAllLikepost(idPost)
+                        countlike : await GetAllLikepost(idPost),
+                        typelike: "removelike",
+                        UserID: idUser
                     };
                     
                 }else{
@@ -80,7 +86,9 @@ let RemoveLikepost = (idPost,idUser) => {
                     LikepostData.errMessage = "Cannot Destroy Like of your";
                     LikepostData.data = {
                         id: idPost,
-                        countlike : await GetAllLikepost(idPost)
+                        countlike : await GetAllLikepost(idPost),
+                        typelike: "removelike",
+                        UserID: idUser
                     };
                 }
                 
