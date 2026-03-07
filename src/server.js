@@ -16,7 +16,7 @@ let app = express();
 
 // Cấu hình CORS để cho phép từ tất cả các nguồn hoặc từ client cụ thể
 app.use(cors({
-    origin: 'http://localhost:3000',  // Địa chỉ client đang chạy (React app)
+    origin: 'https://social-network-be-ll5p.onrender.com',  // Địa chỉ client đang chạy (React app)
     methods: ['GET', 'POST'],         // Các phương thức được phép
     credentials: true                 // Cho phép gửi cookies nếu cần
 }));
