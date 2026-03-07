@@ -25,7 +25,7 @@ const sequelize = new Sequelize(
   process.env.PASSMYSQL,
   {
     host: process.env.HOST,
-    port: process.env.PORT,
+    port: process.env.PORTDB,
     dialect: "mysql",
     logging: false,
 

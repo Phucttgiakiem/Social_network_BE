@@ -319,44 +319,10 @@ let GetProfileUser = (id) => {
                 result.errMessage = 'Cannot found Profile User, Please try again !!!';
                 result.data = [];
             }else {
-                /* let videoowner = await db.Post.findAll({
-                    attributes: ['id','MediaURL','Timestamp','UserID'],
-                    where: {UserID: user.id},
-                    row:true
-                });
-                let totallikevideoowner = 0;
-                for(const item of videoowner){
-                    let countitem = await db.Likepost.count({
-                        where: {PostID:item.id}
-                    })
-                    totallikevideoowner += countitem;
-                }
-                let videolike = await db.Post.findAll({
-                    attributes: ['id', 'MediaURL', 'Timestamp','UserID'], // Chỉ lấy các thông tin cần thiết
-                    where: {
-                        UserID: user.id // Video thuộc về người dùng
-                    },
-                    include: [
-                        {
-                            model: db.Likepost,
-                            attributes: [], // Không cần lấy thông tin về lượt like, chỉ kiểm tra điều kiện
-                            required: true, // Chỉ lấy video có ít nhất một lượt like
-                            as: 'likes', // Alias trùng với định nghĩa association
-                        }
-                    ]
-                });
-                videolike = videolike.map(item => ({
-                    id: item.id,
-                    MediaURL: item.MediaURL,
-                    UserID: item.UserID,
-                    Timestamp: item.Timestamp
-                })); */
+                
                 result.errCode = 0;
                 result.errMessage = 'OK';
                 result.data = user;
-                   /*  videoowner: videoowner,
-                    videolike: videolike,
-                    totallike: totallikevideoowner */
             }
             resolve(result);
         } catch(err){

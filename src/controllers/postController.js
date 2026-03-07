@@ -7,7 +7,6 @@ let GetAllpost = async(req,res) => {
     let limit = Number.parseInt(req.body._limit);
     let offset = (page - 1)*limit;
     let postData = await postService.GetAllPost(limit,offset);
-  //  console.log(postData);
      return res.status(200).json({
          errCode: postData.errCode,
          message: postData.errMessage,

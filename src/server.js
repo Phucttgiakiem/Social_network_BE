@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 viewEngine(app);
 connectDB();
 
-let port = 8096; // Bạn có thể lấy cổng từ process.env nếu cần: process.env.PORT
+let port = process.env.PORT || 8096; // Bạn có thể lấy cổng từ process.env nếu cần: process.env.PORT
 
 // Tạo một HTTP server từ ứng dụng Express
 const httpServer = createServer(app);

@@ -14,7 +14,6 @@ let AddLikepost = async (req,res) => {
             if(resultLike.errCode === 0){
                 const io = getIo();
                 let newpost = resultLike.data;
-                console.log("mày đã like: ",newpost);
                 io.emit('add-like',newpost);
             } 
             return res.status(200).json({
@@ -42,7 +41,6 @@ let RemoveLikepost = async (req,res) => {
             if(resultLike.errCode === 0){
                 const io = getIo();
                 let newpost = resultLike.data;
-                console.log("mày đã unlike: ",newpost);
                 io.emit('remove-like',newpost);
             } 
             return res.status(200).json({
