@@ -3,7 +3,7 @@ const { S3Client,PutObjectCommand,DeleteObjectCommand } = require("@aws-sdk/clie
 //import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 let GetAllpost = async(req,res) => {
    
-    let page = Number.parseInt(req.body._page);
+    /* let page = Number.parseInt(req.body._page);
     let limit = Number.parseInt(req.body._limit);
     let offset = (page - 1)*limit;
     let postData = await postService.GetAllPost(limit,offset);
@@ -11,7 +11,27 @@ let GetAllpost = async(req,res) => {
          errCode: postData.errCode,
          message: postData.errMessage,
          post: postData.data ? postData.data : []
-     })
+     }) */
+    try {
+
+    let page = Number.parseInt(req.body._page);
+    let limit = Number.parseInt(req.body._limit);
+    let offset = (page - 1) * limit;
+
+    let postData = await postService.GetAllPost(limit, offset);
+
+    return res.status(200).json(postData);
+
+  } catch (error) {
+
+    console.log("GET POSTS ERROR:", error);
+
+    return res.status(500).json({
+      errCode: -1,
+      message: "Server error"
+    });
+
+  }
 }
 
 let GetPostwithiduser = async (req,res) => {
