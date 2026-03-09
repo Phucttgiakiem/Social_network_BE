@@ -20,7 +20,11 @@ let GetAllpost = async(req,res) => {
 
     let postData = await postService.GetAllPost(limit, offset);
 
-    return res.status(200).json(postData);
+    return res.status(200).json({
+         errCode: postData.errCode,
+         message: postData.errMessage,
+         post: postData.data ? postData.data : []
+     })
 
   } catch (error) {
 
