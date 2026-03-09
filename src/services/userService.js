@@ -266,17 +266,17 @@ let sendEmailforuser = (Email,type) => {
             //generateUnique
             let createcode = generateUniqueSixDigitNumber();
             const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
+                host: "smtp-relay.brevo.com",
                 port: 587,
                 secure: false, // true for port 465, false for other ports
                 auth: {
-                user: "phuctran2802@gmail.com",
+                user: "a45da9001@smtp-brevo.com",
                 pass: process.env.EMAIL_PASSWORD,
                 },
             });
           // Cấu hình email
             let mailOptions = {
-                from: '"Tiktok social network" <phuctran2802@gmail.com>',
+                from: '"Tiktok social network" <a45da9001@smtp-brevo.com>',
                 to: Email,
                 subject: subjecttext,
                 text: 'This is a test email.',
